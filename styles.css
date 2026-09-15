@@ -1572,15 +1572,15 @@ button {
   color: var(--color-danger);
   min-height: 18px;
 }
-.input-with-icon {
-  position: relative;
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.75;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  padding: 4px;
 }
-.input-icon {
-  position: absolute;
-  right: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  pointer-events: none;
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+  transform: scale(1.1);
 }
 
 /* Interactive Time Slots */
