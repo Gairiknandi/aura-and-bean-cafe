@@ -267,14 +267,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
+  function formatDateToYMD(d) {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
   function getTomorrowDateString() {
     const d = new Date();
     d.setDate(d.getDate() + 1);
-    return d.toISOString().split('T')[0];
+    return formatDateToYMD(d);
   }
 
   function getTodayDateString() {
-    return new Date().toISOString().split('T')[0];
+    return formatDateToYMD(new Date());
   }
 
   // ==========================================================================
@@ -1327,6 +1334,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (closeEventModalBtn) closeEventModalBtn.addEventListener('click', closeEventModal);
   if (eventDoneBtn) eventDoneBtn.addEventListener('click', closeEventModal);
+
+  // Close modals when clicking outside the card on the backdrop
+  [reservationModal, eventInquiryModal, pdfPreviewModal].forEach(modal => {
+    if (modal) {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.classList.remove('active');
+          modal.setAttribute('aria-hidden', 'true');
+        }
+      });
+    }
+  });
+
+  // Global Escape key accessibility listener
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (reservationModal && reservationModal.classList.contains('active')) closeReservationModal();
+      if (eventInquiryModal && eventInquiryModal.classList.contains('active')) closeEventModal();
+      if (pdfPreviewModal && pdfPreviewModal.classList.contains('active')) closePdfModal();
+      if (mobileDrawer && mobileDrawer.classList.contains('active')) closeMobileDrawer();
+    }
+  });
 
   // ==========================================================================
   // 11. NEWSLETTER SUBSCRIPTION & TOAST NOTIFICATIONS
