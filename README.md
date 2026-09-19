@@ -1,6 +1,6 @@
 # Aura & Bean | Artisanal Cafe & Roastery Website
 
-A modern, responsive, and elegant website designed for an artisanal cafe and roastery. Built with semantic HTML5, modern CSS3 (Custom Properties, Flexbox, CSS Grid), and vanilla JavaScript with zero external dependencies or build steps required.
+A modern, responsive, and elegant website designed for an artisanal cafe and roastery. Built with React.js, modern CSS3 (Custom Properties, Flexbox, CSS Grid), and Vite.
 
 ---
 
@@ -55,25 +55,28 @@ A modern, responsive, and elegant website designed for an artisanal cafe and roa
 
 ## 🚀 How to Run the Website
 
-### Option 1: Direct File Opening
-Double-click `index.html` in your file manager or open it in any web browser (Chrome, Safari, Edge, Firefox).
-
-### Option 2: Local Web Server
-You can run a lightweight local server using Python or Node:
-
+### 1. Install Dependencies
 ```bash
-# Using Python 3
-python3 -m http.server 8080
+npm install
+```
 
-# Then open in your browser:
-# http://localhost:8080
+### 2. Start Development Server
+```bash
+npm run dev
+```
+Open [http://localhost:5173](http://localhost:5173) in your web browser.
+
+### 3. Build for Production
+```bash
+npm run build
 ```
 
 ---
 
 ## 🎨 Customization Guide
 
-- **Cafe Name & Tagline**: Change `"AURA & BEAN"` in `index.html` (header, footer, announcement bar) and in `app.js` (dataset title).
-- **Colors & Theme**: Adjust CSS variables in `styles.css` under `:root` (e.g., `--color-warm-caramel`, `--color-espresso`, `--color-cream-bg`).
-- **Menu Items**: Modify or add items to the `MENU_ITEMS` array in `app.js`.
-- **Operating Hours**: Update the `computeLiveHours` function in `app.js` and the schedule in `index.html` if hours differ.
+- **Cafe Name & Tagline**: Change in `src/components/layout/Header.jsx` and `src/components/layout/Footer.jsx`.
+- **Colors & Theme**: Adjust CSS variables in `src/styles.css` under `:root` (e.g., `--color-warm-caramel`, `--color-espresso`, `--color-cream-bg`).
+- **Menu Items**: Modify or add items to `src/data/menuData.js`.
+- **Operating Hours**: Update `src/data/hoursData.js`.
+
