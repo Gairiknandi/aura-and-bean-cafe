@@ -5,3 +5,5 @@ dist/
 server/.env
 *.log
 
+.neon
+.env.local
