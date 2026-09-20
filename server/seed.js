@@ -229,15 +229,21 @@ const INITIAL_TESTIMONIALS = [
 export async function seedDatabase() {
   await initDb();
 
-  // 1. Seed Menu items if empty
-  const menuRes = await pool.query('SELECT COUNT(*) FROM menu_items');
-  if (parseInt(menuRes.rows[0].count, 10) === 0) {
-    console.log('Seeding initial menu items...');
-    for (const item of INITIAL_MENU_ITEMS) {
+  console.log('Seeding and syncing Indian Rupee menu items...');
+  for (const item of INITIAL_MENU_ITEMS) {
       await pool.query(
         `INSERT INTO menu_items (id, title, category, price, numeric_price, description, dietary, image, featured, tag)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-         ON CONFLICT (id) DO NOTHING`,
+         ON CONFLICT (id) DO UPDATE SET
+           title = EXCLUDED.title,
+           category = EXCLUDED.category,
+           price = EXCLUDED.price,
+           numeric_price = EXCLUDED.numeric_price,
+           description = EXCLUDED.description,
+           dietary = EXCLUDED.dietary,
+           image = EXCLUDED.image,
+           featured = EXCLUDED.featured,
+           tag = EXCLUDED.tag`,
         [
           item.id,
           item.title,
@@ -253,7 +259,6 @@ export async function seedDatabase() {
       );
     }
     console.log(`✓ Seeded ${INITIAL_MENU_ITEMS.length} menu items.`);
-  }
 
   // 2. Seed Testimonials if empty
   const testRes = await pool.query('SELECT COUNT(*) FROM testimonials');

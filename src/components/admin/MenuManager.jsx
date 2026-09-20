@@ -68,9 +68,13 @@ export default function MenuManager({ onStatsUpdate }) {
 
   const handleOpenEdit = (item) => {
     setEditingItem(item);
+    const numericVal = item.numericPrice !== undefined 
+      ? item.numericPrice 
+      : String(item.price).replace(/[^0-9]/g, '') || '0';
+
     setFormData({
       ...item,
-      price: item.price.toString()
+      price: numericVal.toString()
     });
     setModalOpen(true);
   };
@@ -80,9 +84,12 @@ export default function MenuManager({ onStatsUpdate }) {
     setSaving(true);
     setFeedback(null);
 
+    const num = parseInt(formData.price, 10) || 0;
     const payload = {
       ...formData,
-      price: parseFloat(formData.price) || 0
+      price: `₹${num}`,
+      numericPrice: num,
+      numeric_price: num
     };
 
     try {
@@ -278,7 +285,9 @@ export default function MenuManager({ onStatsUpdate }) {
                   </td>
                   <td>
                     <span style={{ fontWeight: '700', color: 'var(--color-warm-caramel)', fontSize: '1.05rem' }}>
-                      ${parseFloat(item.price).toFixed(2)}
+                      {typeof item.price === 'string' && item.price.startsWith('₹')
+                        ? item.price
+                        : `₹${item.numericPrice || item.price}`}
                     </span>
                   </td>
                   <td>
@@ -375,13 +384,13 @@ export default function MenuManager({ onStatsUpdate }) {
                     </select>
                   </div>
                   <div className="admin-form-group">
-                    <label className="admin-form-label">Price ($ USD) *</label>
+                    <label className="admin-form-label">Price (₹ INR) *</label>
                     <input 
                       type="number" 
-                      step="0.01" 
+                      step="5" 
                       required
                       className="admin-form-control"
-                      placeholder="6.50"
+                      placeholder="e.g. 240"
                       value={formData.price}
                       onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                     />

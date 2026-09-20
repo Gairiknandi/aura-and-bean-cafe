@@ -108,7 +108,7 @@ export default function EventsView({ onInquirySubmitted, showToast }) {
           event_time: 'Evening',
           guests: guestCount,
           catering_needed: cateringDetails,
-          budget: `$${calculatedTotal}`,
+          budget: `₹${calculatedTotal.toLocaleString('en-IN')}`,
           message: `${hostCompany ? '[Company: ' + hostCompany + '] ' : ''}${eventNotes}`
         })
       });

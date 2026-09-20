@@ -10,15 +10,18 @@ router.get('/', async (req, res) => {
     // Format to match frontend structure (numericPrice, etc.)
     const items = result.rows.map((row) => ({
       id: row.id,
+      name: row.title,
       title: row.title,
       category: row.category,
-      price: row.price,
+      price: row.price.startsWith('₹') ? row.price : `₹${row.price}`,
       numericPrice: row.numeric_price,
       description: row.description,
       dietary: row.dietary || [],
       image: row.image,
       featured: row.featured,
-      tag: row.tag
+      badge: row.tag,
+      tag: row.tag,
+      is_available: true
     }));
     res.json(items);
   } catch (err) {
@@ -33,6 +36,7 @@ router.post('/', async (req, res) => {
     const {
       id,
       title,
+      name,
       category,
       price,
       numericPrice,
@@ -40,12 +44,14 @@ router.post('/', async (req, res) => {
       dietary,
       image,
       featured,
-      tag
+      tag,
+      badge
     } = req.body;
 
-    const itemId = id || title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-    const numPrice = numericPrice ? parseInt(numericPrice, 10) : parseInt(price.replace(/[^0-9]/g, '') || '0', 10);
-    const priceFormatted = price.startsWith('₹') ? price : `₹${price}`;
+    const dishTitle = title || name || 'New Dish';
+    const itemId = id || dishTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    const numPrice = numericPrice ? parseInt(numericPrice, 10) : parseInt(String(price).replace(/[^0-9]/g, '') || '0', 10);
+    const priceFormatted = String(price).startsWith('₹') ? price : `₹${numPrice}`;
 
     const result = await pool.query(
       `INSERT INTO menu_items (id, title, category, price, numeric_price, description, dietary, image, featured, tag)
@@ -53,7 +59,7 @@ router.post('/', async (req, res) => {
        RETURNING *`,
       [
         itemId,
-        title,
+        dishTitle,
         category || 'coffee',
         priceFormatted,
         numPrice,
@@ -61,7 +67,7 @@ router.post('/', async (req, res) => {
         dietary || [],
         image || 'https://images.unsplash.com/photo-1534778101976-62847782c213?auto=format&fit=crop&w=600&q=80',
         featured === true,
-        tag || ''
+        tag || badge || ''
       ]
     );
 
@@ -78,6 +84,7 @@ router.put('/:id', async (req, res) => {
     const { id } = req.params;
     const {
       title,
+      name,
       category,
       price,
       numericPrice,
@@ -85,13 +92,32 @@ router.put('/:id', async (req, res) => {
       dietary,
       image,
       featured,
-      tag
+      tag,
+      badge
     } = req.body;
 
+    // Support partial updates
+    const existing = await pool.query('SELECT * FROM menu_items WHERE id = $1', [id]);
+    if (existing.rows.length === 0) {
+      return res.status(404).json({ error: 'Menu item not found' });
+    }
+    const current = existing.rows[0];
+
+    const dishTitle = title || name || current.title;
+    const cat = category || current.category;
     const numPrice = numericPrice !== undefined
       ? parseInt(numericPrice, 10)
-      : parseInt(String(price).replace(/[^0-9]/g, '') || '0', 10);
-    const priceFormatted = String(price).startsWith('₹') ? price : `₹${price}`;
+      : price !== undefined
+      ? parseInt(String(price).replace(/[^0-9]/g, '') || '0', 10)
+      : current.numeric_price;
+    const priceFormatted = price !== undefined
+      ? (String(price).startsWith('₹') ? price : `₹${numPrice}`)
+      : current.price;
+    const desc = description !== undefined ? description : current.description;
+    const diet = dietary !== undefined ? dietary : current.dietary;
+    const img = image !== undefined ? image : current.image;
+    const feat = featured !== undefined ? featured : current.featured;
+    const t = tag !== undefined ? tag : badge !== undefined ? badge : current.tag;
 
     const result = await pool.query(
       `UPDATE menu_items
@@ -99,22 +125,18 @@ router.put('/:id', async (req, res) => {
        WHERE id = $10
        RETURNING *`,
       [
-        title,
-        category,
+        dishTitle,
+        cat,
         priceFormatted,
         numPrice,
-        description,
-        dietary || [],
-        image,
-        featured === true,
-        tag,
+        desc,
+        diet || [],
+        img,
+        feat === true,
+        t,
         id
       ]
     );
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Menu item not found' });
-    }
 
     res.json(result.rows[0]);
   } catch (err) {
