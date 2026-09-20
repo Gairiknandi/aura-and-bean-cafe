@@ -37,11 +37,32 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Start Server & Initialize Database
+// DB initialization flag for serverless environments
+let dbInitialized = false;
+export async function ensureDbReady() {
+  if (!dbInitialized) {
+    try {
+      await initDb();
+      await seedDatabase();
+      dbInitialized = true;
+    } catch (e) {
+      console.error('DB initialization error:', e.message);
+    }
+  }
+}
+
+// Middleware to ensure DB is initialized on cold starts
+app.use(async (req, res, next) => {
+  if (!dbInitialized && req.path.startsWith('/api')) {
+    await ensureDbReady();
+  }
+  next();
+});
+
+// Start Server & Initialize Database (when running as standalone server)
 async function startServer() {
   try {
-    await initDb();
-    await seedDatabase();
+    await ensureDbReady();
 
     app.listen(PORT, () => {
       console.log(`================================================`);
@@ -56,4 +77,8 @@ async function startServer() {
   }
 }
 
-startServer();
+if (!process.env.VERCEL) {
+  startServer();
+}
+
+export default app;

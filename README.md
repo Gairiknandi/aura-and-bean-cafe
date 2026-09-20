@@ -122,11 +122,53 @@ Access the Admin Portal by clicking the **"Admin"** lock button in the top navig
 
 ---
 
+## ⚡ Deploying to Vercel (Full-Stack)
+
+The repository is configured out-of-the-box for **Vercel** with a Vite React SPA frontend and a Serverless Express API backend connected to PostgreSQL.
+
+### Step 1: Push to GitHub
+```bash
+git push origin main
+```
+
+### Step 2: Import into Vercel
+1. Go to [Vercel Dashboard](https://vercel.com/dashboard) and click **"Add New Project"**.
+2. Select your GitHub repository: `aura-and-bean-cafe`.
+3. Vercel will automatically detect Vite and use settings from [`vercel.json`](file:///Users/gairiknandi/Desktop/Demo%20Cafe%20Site/vercel.json):
+   - **Framework Preset**: Vite
+   - **Build Command**: `npm run build`
+   - **Output Directory**: `dist`
+
+### Step 3: Configure Database Environment Variable
+Because Vercel serverless functions run in the cloud, they connect to a cloud PostgreSQL database:
+- Under **Storage** in Vercel: Click **"Create Database"** -> **"Postgres"** (Vercel Postgres powered by Neon), and connect it to your project. Vercel will automatically add `DATABASE_URL`!
+- Alternatively, use any free cloud Postgres from [Neon.tech](https://neon.tech), [Supabase](https://supabase.com), or [Railway](https://railway.app), and paste the connection string into Vercel **Project Settings -> Environment Variables**:
+  ```
+  DATABASE_URL=postgres://user:password@ep-cool-pond.region.neon.tech/neondb?sslmode=require
+  ```
+
+### Step 4: (Optional) Production SMTP Email Dispatch
+If you wish to send emails through your real domain or Gmail/SendGrid, add:
+```
+SMTP_HOST=smtp.sendgrid.net
+SMTP_PORT=587
+SMTP_USER=apikey
+SMTP_PASS=your-sendgrid-api-key
+EMAIL_FROM=hello@aurabeancafe.com
+```
+*(If unset, the app uses Ethereal test accounts and provides instant preview URLs for every booking accepted!)*
+
+### Step 5: Deploy
+Click **"Deploy"**. Your live URL (e.g. `https://aura-and-bean-cafe.vercel.app`) will be ready in under 60 seconds!
+
+---
+
 ## 🎨 Customization Guide
 
 - **Cafe Name & Tagline**: Change in `src/components/layout/Header.jsx` and `src/components/layout/Footer.jsx`.
 - **Colors & Theme**: Adjust CSS variables in `src/styles.css` under `:root` (e.g., `--color-warm-caramel`, `--color-espresso`, `--color-cream-bg`).
 - **Menu Items**: Live updates via Admin Portal or baseline dataset in `src/data/menuData.js`.
 - **Operating Hours**: Update `src/data/hoursData.js` or override in Admin Portal.
+
 
 

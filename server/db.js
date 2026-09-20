@@ -10,13 +10,24 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export const pool = new Pool({
-  host: process.env.PGHOST || 'localhost',
-  port: parseInt(process.env.PGPORT || '5432', 10),
-  database: process.env.PGDATABASE || 'aurabean_db',
-  user: process.env.PGUSER || process.env.USER || 'postgres',
-  password: process.env.PGPASSWORD || undefined
-});
+const isProduction = process.env.NODE_ENV === 'production' || !!process.env.VERCEL;
+
+const poolConfig = process.env.DATABASE_URL
+  ? {
+      connectionString: process.env.DATABASE_URL,
+      ssl: process.env.DATABASE_URL.includes('localhost')
+        ? false
+        : { rejectUnauthorized: false }
+    }
+  : {
+      host: process.env.PGHOST || 'localhost',
+      port: parseInt(process.env.PGPORT || '5432', 10),
+      database: process.env.PGDATABASE || 'aurabean_db',
+      user: process.env.PGUSER || process.env.USER || 'postgres',
+      password: process.env.PGPASSWORD || undefined
+    };
+
+export const pool = new Pool(poolConfig);
 
 export async function initDb() {
   try {
