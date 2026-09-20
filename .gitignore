@@ -7,3 +7,6 @@ server/.env
 
 .neon
 .env.local
+.vercel
+
+.env*
