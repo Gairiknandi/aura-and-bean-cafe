@@ -73,10 +73,60 @@ npm run build
 
 ---
 
+## 🛠️ Backend API & PostgreSQL Database (`server/`)
+
+The application features an enterprise Express.js backend connecting to a local PostgreSQL database (`aurabean_db`) with automated transactional email confirmations.
+
+### Features
+1. **PostgreSQL Database (`aurabean_db`)**:
+   - `bookings`: Stores guest reservations, contact details, date/time, party size, seating preferences, status, and email dispatch flag.
+   - `event_inquiries`: Stores private event and catering requests.
+   - `menu_items`: Dynamic menu catalog with live price updates, images, dietary tags, and availability status.
+   - `testimonials`: Customer reviews, star ratings, quotes, and homepage featured status.
+   - `store_settings`: Store open/closed mode overrides and live announcement banner settings.
+2. **Automated Client Email Dispatch (`server/mailer.js`)**:
+   - When a booking is accepted by an admin, a confirmation email is automatically sent to the guest.
+   - Supports production SMTP (SendGrid, Mailgun, AWS SES, Gmail) and automatic fallback to Ethereal mock email with instant preview URLs.
+
+### Starting the Backend
+```bash
+# Start backend server on port 5050
+npm run server
+
+# Re-seed default database records
+npm run seed
+```
+
+---
+
+## 🔒 Staff Admin Management Portal (`#admin`)
+
+Access the Admin Portal by clicking the **"Admin"** lock button in the top navigation bar or the **"Admin Portal 🔒"** link in the footer.
+
+- **Passcode Gate**: Default passcode is `admin123`.
+- **Management Features**:
+  1. **Bookings & Requests**:
+     - Live overview of table reservations and event inquiries.
+     - Filter by `All`, `Pending`, `Confirmed`, and `Cancelled`.
+     - One-click **"Accept & Email"** button: Updates booking status to `confirmed` in PostgreSQL and automatically dispatches a branded confirmation email to the guest.
+  2. **Menu, Pricing & Imagery**:
+     - Add new dishes, edit prices, descriptions, and high-res image URLs.
+     - Instant availability toggle (marks items as "Available" or "Sold Out").
+     - Delete or update any dish in real time.
+  3. **Customer Reviews**:
+     - Add, edit, or delete customer testimonials and star ratings.
+     - Toggle which reviews are featured on the homepage carousel.
+  4. **Store Operations & Status**:
+     - Toggle between **Automatic (7 AM – 8 PM schedule)**, **Force Open (Special Event)**, and **Force Closed (Emergency / Maintenance)**.
+     - Live Announcement Banner editor with on/off toggle.
+
+---
+
 ## 🎨 Customization Guide
 
 - **Cafe Name & Tagline**: Change in `src/components/layout/Header.jsx` and `src/components/layout/Footer.jsx`.
 - **Colors & Theme**: Adjust CSS variables in `src/styles.css` under `:root` (e.g., `--color-warm-caramel`, `--color-espresso`, `--color-cream-bg`).
-- **Menu Items**: Modify or add items to `src/data/menuData.js`.
-- **Operating Hours**: Update `src/data/hoursData.js`.
+- **Menu Items**: Live updates via Admin Portal or baseline dataset in `src/data/menuData.js`.
+- **Operating Hours**: Update `src/data/hoursData.js` or override in Admin Portal.
+
 

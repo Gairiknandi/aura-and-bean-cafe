@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
 
-export default function AnnouncementBar({ onNavigate }) {
+export default function AnnouncementBar({ onNavigate, customAnnouncement }) {
   const [isOpen, setIsOpen] = useState(true);
 
   if (!isOpen) return null;
+  if (customAnnouncement && customAnnouncement.enabled === false) return null;
+
+  const messageText = customAnnouncement?.text || 'Autumn Spiced Pecan Flat White & Caramel Fig Brioche are back!';
 
   return (
     <div className="announcement-bar" id="announcementBar">
       <div className="announcement-content">
         <span className="badge-pill">Now In Season</span>
-        <span>Autumn Spiced Pecan Flat White & Caramel Fig Brioche are back!</span>
+        <span>{messageText}</span>
         <a
           href="#menu"
           className="announcement-link"

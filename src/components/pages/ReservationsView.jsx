@@ -63,7 +63,7 @@ export default function ReservationsView({ onNavigate, onReservationConfirmed, s
     return dateStr;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const newErrors = {};
@@ -93,8 +93,35 @@ export default function ReservationsView({ onNavigate, onReservationConfirmed, s
 
     setErrors({});
 
-    const refCode = '#AB-' + Math.floor(1000 + Math.random() * 9000);
+    let refCode = '#AB-' + Math.floor(1000 + Math.random() * 9000);
     const dateFormatted = formatSummaryDate(bookingDate);
+
+    try {
+      const response = await fetch('/api/bookings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          full_name: nameTrimmed,
+          email: emailTrimmed,
+          phone: guestPhone.trim(),
+          booking_date: bookingDate,
+          booking_time: selectedTime,
+          guests: guests,
+          seating_preference: seatingArea,
+          occasion: bookingOccasion,
+          special_requests: specialRequests.trim()
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.booking?.reference_number) {
+          refCode = data.booking.reference_number;
+        }
+      }
+    } catch (err) {
+      console.warn('Booking API offline, proceeding with local confirmation:', err);
+    }
 
     onReservationConfirmed({
       bookingCode: refCode,
@@ -105,7 +132,7 @@ export default function ReservationsView({ onNavigate, onReservationConfirmed, s
       occasion: bookingOccasion
     });
 
-    showToast(`Reservation ${refCode} confirmed! We've sent confirmation to your email.`, 'success');
+    showToast(`Reservation ${refCode} booked! Confirmation logged and pending review.`, 'success');
 
     // Reset form fields
     setGuests(2);

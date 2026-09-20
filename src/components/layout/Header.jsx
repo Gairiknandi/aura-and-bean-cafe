@@ -80,6 +80,16 @@ export default function Header({ currentView, onNavigate, liveHours }) {
           >
             Reserve Table
           </a>
+          <a
+            href="#admin"
+            className={`btn btn-outline-light btn-sm ${currentView === 'admin' ? 'active' : ''}`}
+            style={{ padding: '6px 11px', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', gap: '5px' }}
+            onClick={(e) => handleNavClick('admin', e)}
+            title="Management Portal"
+          >
+            <i className="fa-solid fa-lock" style={{ fontSize: '0.75rem' }}></i>
+            <span>Admin</span>
+          </a>
 
           {/* Mobile Menu Toggle Button */}
           <button
@@ -137,6 +147,17 @@ export default function Header({ currentView, onNavigate, liveHours }) {
                 </a>
               </li>
             ))}
+            <li style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px solid var(--color-border)' }}>
+              <a
+                href="#admin"
+                className={`mobile-nav-link ${currentView === 'admin' ? 'active' : ''}`}
+                onClick={(e) => handleNavClick('admin', e)}
+                style={{ color: 'var(--color-warm-caramel)', fontWeight: '600' }}
+              >
+                <i className="fa-solid fa-shield-halved" style={{ marginRight: '8px' }}></i>
+                Admin Portal 🔒
+              </a>
+            </li>
           </ul>
           <div className="mobile-drawer-footer">
             <a

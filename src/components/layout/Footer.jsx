@@ -313,6 +313,19 @@ export default function Footer({ onNavigate, showToast, liveHours }) {
             >
               Allergen Guide
             </a>
+            <span className="bullet">•</span>
+            <a
+              href="#admin"
+              id="footerAdminLink"
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigate('admin');
+              }}
+              style={{ color: 'var(--color-warm-caramel)', fontWeight: '600' }}
+              title="Staff Portal (Bookings, Menu, Reviews & Live Status)"
+            >
+              Admin Portal 🔒
+            </a>
           </div>
         </div>
       </div>

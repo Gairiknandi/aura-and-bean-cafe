@@ -60,7 +60,7 @@ export default function EventsView({ onInquirySubmitted, showToast }) {
     return total;
   })();
 
-  const handleSubmitInquiry = (e) => {
+  const handleSubmitInquiry = async (e) => {
     e.preventDefault();
 
     const errors = {};
@@ -91,7 +91,38 @@ export default function EventsView({ onInquirySubmitted, showToast }) {
 
     setFormErrors({});
 
-    const ticketId = '#EVT-' + Math.floor(1000 + Math.random() * 9000);
+    let ticketId = '#EVT-' + Math.floor(1000 + Math.random() * 9000);
+
+    try {
+      const addonsList = Array.from(selectedAddons).join(', ');
+      const cateringDetails = `${selectedPackage.title}${addonsList ? ' + Addons: ' + addonsList : ''}`;
+      const response = await fetch('/api/events', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          full_name: nameTrimmed,
+          email: emailTrimmed,
+          phone: phoneTrimmed,
+          event_type: activeTab,
+          event_date: dateTrimmed,
+          event_time: 'Evening',
+          guests: guestCount,
+          catering_needed: cateringDetails,
+          budget: `$${calculatedTotal}`,
+          message: `${hostCompany ? '[Company: ' + hostCompany + '] ' : ''}${eventNotes}`
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.event?.reference_number) {
+          ticketId = data.event.reference_number;
+        }
+      }
+    } catch (err) {
+      console.warn('Events API offline, proceeding with local inquiry ID:', err);
+    }
+
     onInquirySubmitted(ticketId);
 
     showToast(`Inquiry ${ticketId} dispatched to our Private Events Concierge!`, 'success');

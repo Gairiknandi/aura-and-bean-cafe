@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { MENU_ITEMS, MENU_CATEGORIES } from '../../data/menuData';
 
-export default function MenuView({ onNavigate, onOpenPdfModal }) {
+export default function MenuView({ onNavigate, onOpenPdfModal, customMenuItems }) {
+  const menuList = (customMenuItems && customMenuItems.length > 0) ? customMenuItems : MENU_ITEMS;
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
   const [activeDiets, setActiveDiets] = useState(new Set());
@@ -30,21 +31,21 @@ export default function MenuView({ onNavigate, onOpenPdfModal }) {
   const filteredItems = useMemo(() => {
     const q = searchQuery.toLowerCase().trim();
 
-    return MENU_ITEMS.filter((item) => {
+    return menuList.filter((item) => {
       // Category match
       if (activeCategory !== 'all' && item.category !== activeCategory) {
         return false;
       }
       // Dietary match (must satisfy all selected active diets)
       for (const diet of activeDiets) {
-        if (!item.dietary.includes(diet)) {
+        if (!item.dietary || !item.dietary.includes(diet)) {
           return false;
         }
       }
       // Search query match
       if (q) {
-        const titleMatch = item.title.toLowerCase().includes(q);
-        const descMatch = item.description.toLowerCase().includes(q);
+        const titleMatch = item.title && item.title.toLowerCase().includes(q);
+        const descMatch = item.description && item.description.toLowerCase().includes(q);
         const tagMatch = item.tag && item.tag.toLowerCase().includes(q);
         if (!titleMatch && !descMatch && !tagMatch) {
           return false;
@@ -52,7 +53,7 @@ export default function MenuView({ onNavigate, onOpenPdfModal }) {
       }
       return true;
     });
-  }, [searchQuery, activeCategory, activeDiets]);
+  }, [searchQuery, activeCategory, activeDiets, menuList]);
 
   return (
     <section className="page-view active" id="view-menu">

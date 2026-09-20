@@ -2,20 +2,22 @@ import React, { useState, useEffect, useRef } from 'react';
 import { MENU_ITEMS } from '../../data/menuData';
 import { TESTIMONIALS } from '../../data/testimonialsData';
 
-export default function HomeView({ onNavigate, liveHours }) {
+export default function HomeView({ onNavigate, liveHours, customMenuItems, customTestimonials }) {
+  const testimonialsList = (customTestimonials && customTestimonials.length > 0) ? customTestimonials : TESTIMONIALS;
+  const menuList = (customMenuItems && customMenuItems.length > 0) ? customMenuItems : MENU_ITEMS;
   const [currentTestimonialIndex, setCurrentTestimonialIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
-  const featuredItems = MENU_ITEMS.filter((item) => item.featured);
+  const featuredItems = menuList.filter((item) => item.featured);
 
   const prevTestimonial = () => {
     setCurrentTestimonialIndex((prev) =>
-      prev === 0 ? TESTIMONIALS.length - 1 : prev - 1
+      prev === 0 ? testimonialsList.length - 1 : prev - 1
     );
   };
 
   const nextTestimonial = () => {
     setCurrentTestimonialIndex((prev) =>
-      prev === TESTIMONIALS.length - 1 ? 0 : prev + 1
+      prev === testimonialsList.length - 1 ? 0 : prev + 1
     );
   };
 
@@ -398,7 +400,7 @@ export default function HomeView({ onNavigate, liveHours }) {
             </button>
 
             <div className="testimonial-carousel-track" id="testimonialTrack">
-              {TESTIMONIALS.map((item, index) => (
+              {testimonialsList.map((item, index) => (
                 <div
                   key={index}
                   className={`testimonial-slide ${index === currentTestimonialIndex ? 'active' : ''}`}
@@ -420,7 +422,7 @@ export default function HomeView({ onNavigate, liveHours }) {
                     />
                     <div className="author-info">
                       <h4>{item.name}</h4>
-                      <p>{item.title}</p>
+                      <p>{item.title || item.role}</p>
                     </div>
                   </div>
                 </div>
